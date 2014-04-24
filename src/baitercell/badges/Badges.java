@@ -1,19 +1,9 @@
 package baitercell.badges;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-
 import org.bukkit.plugin.java.JavaPlugin;
-
-
-
-
 
 public class Badges extends JavaPlugin {
 
-	public Connection con;
-	
-	
 	public void onEnable(){
 		System.out.println(this + " is now enabled");	
 		init();
@@ -24,22 +14,17 @@ public class Badges extends JavaPlugin {
 		// create a default config if one doesnt exist
 		this.saveDefaultConfig(); 
 		
-		//get the details out of the file
-		String ip = this.getConfig().getString("ip");
-		String port = this.getConfig().getString("port");
-		String dbName = this.getConfig().getString("dbName");
-		String username = this.getConfig().getString("username");
-		String password= this.getConfig().getString("password");
+		DBConManager DBCM = new DBConManager(this);
 		
-		
-		
-		//open a connection to the DB
-		try{
-			Class.forName("com.mysql.jdbc.Driver"); //use this driver
-			con = DriverManager.getConnection("jdbc:mysql://" + ip + ":" + port + "/" + dbName,  username, password);
+		DBCM.openDBConnection();
+		try {
+			DBCM.checkTables();
 		} catch (Exception e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		
 		
 		//check db for tables
 		
