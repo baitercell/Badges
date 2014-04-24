@@ -1,0 +1,5 @@
+ip: IP
+port: PORT
+dbName: DBNAME
+username: USERNAME
+password: PASSWORD

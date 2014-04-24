@@ -1,0 +1,4 @@
+name: Badges
+version: 0.1
+main: baitercell.badges.Badges
+description: Manages badges
