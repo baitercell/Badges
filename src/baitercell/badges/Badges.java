@@ -2,11 +2,19 @@ package baitercell.badges;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
+import baitercell.badges.commands.BadgeExecutor;
+
+
+
 public class Badges extends JavaPlugin {
+	
+	public DBConManager DBCM;
 
 	public void onEnable(){
 		System.out.println(this + " is now enabled");	
 		init();
+		
+		getCommand("badge").setExecutor(new BadgeExecutor());
 	}
 	
 	private void init() {
@@ -14,32 +22,36 @@ public class Badges extends JavaPlugin {
 		// create a default config if one doesnt exist
 		this.saveDefaultConfig(); 
 		
-		DBConManager DBCM = new DBConManager(this);
+		//create a new connection manager passing it the plugin, so it can read the config.yml
+		DBCM = new DBConManager(this);
 		
+		//open a new connection to the database
 		DBCM.openDBConnection();
+
+		
+		//generate tables if they don't already exist
 		try {
-			DBCM.checkTables();
+			DBCM.createTables();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			System.out.println("Unable to create tables, check the connection has connected");
 			e.printStackTrace();
 		}
 		
-		
-		
-		//check db for tables
-		
-		//create tables
-		
-		//start db connection refresher thread
-		
-		//start listeners
-		
+		//database connection checker, to make sure the plugin still has a connection
+		Thread DBConChecker = new Thread(DBCM);
+		DBConChecker.start();
+				
+		//listener for changing the text on a sign (part of placing)
+		new SignChangeListener(this);	
 	}
 
 	public void onDisable(){
 		System.out.println(this + " is now disabled");
 		
+		//stop thread checking for a connection
+		DBCM.setRunning(false);
 		//close db connection
+		DBCM.closeConnection();
 	}
 	
 }

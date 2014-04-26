@@ -3,3 +3,10 @@ port: PORT
 dbName: DBNAME
 username: USERNAME
 password: PASSWORD
+
+# Set this to the time that the plugin
+# will take to re-connect to the database
+# in the case of a dropped connection.
+# Default is 3 minutes (180000)
+
+timeout: 180000
