@@ -1,4 +1,4 @@
-package baitercell.badges;
+package baitercell.badges.events;
 
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;

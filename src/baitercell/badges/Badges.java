@@ -3,6 +3,7 @@ package baitercell.badges;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import baitercell.badges.commands.BadgeExecutor;
+import baitercell.badges.events.SignChangeListener;
 
 
 
@@ -14,7 +15,7 @@ public class Badges extends JavaPlugin {
 		System.out.println(this + " is now enabled");	
 		init();
 		
-		getCommand("badge").setExecutor(new BadgeExecutor());
+		getCommand("badge").setExecutor(new BadgeExecutor(DBCM));
 	}
 	
 	private void init() {
