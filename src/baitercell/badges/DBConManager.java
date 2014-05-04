@@ -17,6 +17,7 @@ public class DBConManager extends Thread {
 	
 	public Boolean running;
 	
+	//The connection to the database
 	public Connection con;
 	
 	Badges badges;
@@ -60,7 +61,7 @@ public class DBConManager extends Thread {
 		Statement st = con.createStatement();
 
 		st.executeUpdate("CREATE TABLE IF NOT EXISTS `badgedb`.`badge` ( `idbadge` INT NOT NULL AUTO_INCREMENT, `badgeName` VARCHAR(45) NULL,  PRIMARY KEY (`idbadge`))ENGINE = InnoDB;");		
-		st.executeUpdate("CREATE TABLE IF NOT EXISTS `badgedb`.`player` (`idplayer` INT NOT NULL AUTO_INCREMENT, `PlayerName` VARCHAR(45) NULL, PRIMARY KEY (`idplayer`))ENGINE = InnoDB;");		
+		st.executeUpdate("CREATE TABLE IF NOT EXISTS `badgedb`.`player` (`idplayer` INT NOT NULL AUTO_INCREMENT, `playerName` VARCHAR(45) NULL, PRIMARY KEY (`idplayer`))ENGINE = InnoDB;");		
 		st.executeUpdate("CREATE TABLE IF NOT EXISTS `shirt` (`player_idplayer` INT NOT NULL,`badge_idbadge` INT NOT NULL, PRIMARY KEY (`player_idplayer`,`badge_idbadge`), KEY `fk_shirt_player_idx` (`player_idplayer`), KEY `fk_shirt_badge1_idx` (`badge_idbadge`), CONSTRAINT `fk_shirt_badge1` FOREIGN KEY (`badge_idbadge`) REFERENCES `badge` (`idbadge`) ON DELETE NO ACTION ON UPDATE NO ACTION, CONSTRAINT `fk_shirt_player` FOREIGN KEY (`player_idplayer`) REFERENCES `player` (`idplayer`) ON DELETE NO ACTION ON UPDATE NO ACTION) ENGINE=InnoDB;");		
 	}
 	

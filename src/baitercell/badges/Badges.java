@@ -1,10 +1,15 @@
 package baitercell.badges;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import baitercell.badges.commands.BadgeExecutor;
-import baitercell.badges.events.SignChangeListener;
-
+import baitercell.badges.events.EventListener;
 
 
 public class Badges extends JavaPlugin {
@@ -12,25 +17,20 @@ public class Badges extends JavaPlugin {
 	public DBConManager DBCM;
 
 	public void onEnable(){
-		System.out.println(this + " is now enabled");	
 		init();
-		
-		getCommand("badge").setExecutor(new BadgeExecutor(DBCM));
 	}
 	
 	private void init() {
-		
-		// create a default config if one doesnt exist
+		//Create a default config if one doesnt exist
 		this.saveDefaultConfig(); 
 		
-		//create a new connection manager passing it the plugin, so it can read the config.yml
+		//Create a new connection manager passing it the plugin, so it can read the config.yml
 		DBCM = new DBConManager(this);
 		
-		//open a new connection to the database
+		//Open a new connection to the database
 		DBCM.openDBConnection();
 
-		
-		//generate tables if they don't already exist
+		//Generate tables if they don't already exist
 		try {
 			DBCM.createTables();
 		} catch (Exception e) {
@@ -38,21 +38,50 @@ public class Badges extends JavaPlugin {
 			e.printStackTrace();
 		}
 		
-		//database connection checker, to make sure the plugin still has a connection
+		//Database connection checker, to make sure the plugin still has a connection
 		Thread DBConChecker = new Thread(DBCM);
 		DBConChecker.start();
 				
-		//listener for changing the text on a sign (part of placing)
-		new SignChangeListener(this);	
+		//Listener for all events
+		new EventListener(this, DBCM);	
+		
+		//The executor for all commands
+		getCommand("badge").setExecutor(new BadgeExecutor(DBCM));
+		
+		AddPlayersToDB();
 	}
 
 	public void onDisable(){
-		System.out.println(this + " is now disabled");
-		
 		//stop thread checking for a connection
 		DBCM.setRunning(false);
 		//close db connection
 		DBCM.closeConnection();
 	}
 	
+	//Adds players to the DB
+	//Only runs on server startup
+	//because players could be logged in before
+	//the plugin is running
+	public void AddPlayersToDB(){
+		Player[] onlinePlayers = Bukkit.getOnlinePlayers();
+
+		for( int i = 0; i < onlinePlayers.length; i++) {
+			try {
+				Statement st = DBCM.con.createStatement();
+				
+				//Check if the player already exists in the DB
+				ResultSet rs = st.executeQuery("SELECT * FROM " +  DBCM.dbName + ".player WHERE playerName='" + onlinePlayers[i].getName() + "';");
+				
+				//Loop through the results, will skip if there are no results
+				while(rs.next()) {
+					return;
+				}
+				//Insert the badge into the table
+				st.executeUpdate("INSERT INTO `" + DBCM.dbName + "`.`player` (`playerName`) VALUES('" + onlinePlayers[i].getName() + "');");
+				
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}		
+		}
+	}
 }

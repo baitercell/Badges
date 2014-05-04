@@ -1,5 +1,6 @@
 package baitercell.badges.commands;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -47,8 +48,9 @@ public class BadgeExecutor implements CommandExecutor {
 	}
 	
 	
-	
+	//Creation of a badge
 	public boolean Create(CommandSender sender, Command cmd, String label, String[] args){
+		//If a badge name hasn't been put in stop running
 		if(args.length < 2) {
 			sender.sendMessage(ChatColor.GOLD + "[Badges] " + ChatColor.GREEN + "No badge name was entered");
 			return true;
@@ -59,9 +61,18 @@ public class BadgeExecutor implements CommandExecutor {
 		try {
 			Statement st = DBCM.con.createStatement();
 			
+			ResultSet rs = st.executeQuery("SELECT * FROM " +  DBCM.dbName + ".badge;");
+			
+			//Check if the badge already exists in the DB
+			while(rs.next()) {
+				if(rs.getString("badgeName").equals(args[1])) { 
+					sender.sendMessage(ChatColor.GOLD + "[Badges] " + ChatColor.GREEN + "A badge with the name " + ChatColor.GOLD + args[1] + ChatColor.GREEN + " already exists");
+					return true;
+				}
+			}
+			//Insert the badge into the table
 			st.executeUpdate("INSERT INTO `" + DBCM.dbName + "`.`badge` (`badgeName`) VALUES('" + args[1] + "');");
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -70,18 +81,23 @@ public class BadgeExecutor implements CommandExecutor {
 		
 	}
 	
+	//deletion of a badge
 	public boolean Delete(CommandSender sender, Command cmd, String label, String[] args){
 		System.out.println("Delete");
 		return true;
 		
 	}
 	
+	//help on how to use the plugin
 	public boolean Help(CommandSender sender, Command cmd, String label, String[] args){
 		System.out.println("help");
 		return true;
 		
 	}
 	
+	
+	//returns a list of all the players badges
+	//if another player is added as a arg, then it displays theirs
 	public boolean User(CommandSender sender, Command cmd, String label, String[] args){
 		System.out.println("User");
 		return true;
